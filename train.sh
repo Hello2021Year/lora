@@ -47,6 +47,7 @@ if [[ "$mode" == smoke ]]; then
         --dataset "$data_dir/smoke.jsonl" --max_steps "$smoke_steps"
         --gradient_accumulation_steps 1 --eval_strategy no
         --save_strategy steps --save_steps "$smoke_steps"
+        --create_checkpoint_symlink false
     )
 else
     world_size=$((NPROC_PER_NODE * NNODES))
@@ -56,6 +57,7 @@ else
         --num_train_epochs "${EPOCHS:-1}"
         --gradient_accumulation_steps "${GRAD_ACCUM:-$gradient_accumulation}"
         --eval_strategy epoch --save_strategy epoch
+        --create_checkpoint_symlink true
     )
 fi
 
@@ -73,4 +75,4 @@ exec swift sft \
     --dataset_num_proc "${DATASET_NUM_PROC:-4}" \
     --dataloader_num_workers 2 --seed 42 --data_seed 42 \
     --logging_steps 1 --report_to none --save_total_limit 2 \
-    --create_checkpoint_symlink true --output_dir "$output_dir" "${mode_args[@]}"
+    --output_dir "$output_dir" "${mode_args[@]}"
