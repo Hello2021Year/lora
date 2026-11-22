@@ -1,0 +1,6 @@
+/.venv/
+/inputs/
+/prepared/
+/outputs/
+/results/
+__pycache__/
