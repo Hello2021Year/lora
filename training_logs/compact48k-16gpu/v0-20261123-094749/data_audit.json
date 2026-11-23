@@ -1,0 +1,135 @@
+{
+  "archive_sha256": "f4d651c658f7b79f94e1ed603a07adf9c9ca50d33e670c849ef3236635612c16",
+  "reference_model_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+  "tokenizer_sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+  "representation": "compact",
+  "max_length": 49152,
+  "length_margin": 32,
+  "splits": {
+    "train": {
+      "rows": 1544,
+      "labels": {
+        "YES": 896,
+        "NO": 648
+      },
+      "kept_rows": 1321,
+      "kept_labels": {
+        "YES": 778,
+        "NO": 543
+      },
+      "dropped_overlength": 223,
+      "tokens": {
+        "min": 2468,
+        "p50": 21437,
+        "p90": 57495,
+        "p95": 67207,
+        "p99": 86662,
+        "max": 104686,
+        "total": 39864126,
+        "counts_at_caps_with_margin": {
+          "8192": 387,
+          "16384": 687,
+          "24576": 872,
+          "32768": 1036,
+          "49152": 1321,
+          "65536": 1459,
+          "98304": 1540
+        }
+      },
+      "unique": {
+        "full_user": 1544,
+        "state": 839,
+        "initial_user": 125
+      }
+    },
+    "validation": {
+      "rows": 193,
+      "labels": {
+        "YES": 112,
+        "NO": 81
+      },
+      "kept_rows": 172,
+      "kept_labels": {
+        "YES": 101,
+        "NO": 71
+      },
+      "dropped_overlength": 21,
+      "tokens": {
+        "min": 2490,
+        "p50": 24799,
+        "p90": 52090,
+        "p95": 59076,
+        "p99": 86739,
+        "max": 89386,
+        "total": 4929623,
+        "counts_at_caps_with_margin": {
+          "8192": 46,
+          "16384": 68,
+          "24576": 94,
+          "32768": 140,
+          "49152": 172,
+          "65536": 187,
+          "98304": 193
+        }
+      },
+      "unique": {
+        "full_user": 193,
+        "state": 104,
+        "initial_user": 13
+      }
+    },
+    "test": {
+      "rows": 193,
+      "labels": {
+        "YES": 112,
+        "NO": 81
+      },
+      "kept_rows": 138,
+      "kept_labels": {
+        "YES": 74,
+        "NO": 64
+      },
+      "dropped_overlength": 55,
+      "tokens": {
+        "min": 2597,
+        "p50": 27093,
+        "p90": 86456,
+        "p95": 93025,
+        "p99": 103123,
+        "max": 105933,
+        "total": 7060245,
+        "counts_at_caps_with_margin": {
+          "8192": 31,
+          "16384": 64,
+          "24576": 80,
+          "32768": 118,
+          "49152": 138,
+          "65536": 149,
+          "98304": 191
+        }
+      },
+      "unique": {
+        "full_user": 193,
+        "state": 108,
+        "initial_user": 12
+      }
+    }
+  },
+  "split_overlap": {
+    "train/validation": {
+      "full_user": 0,
+      "state": 0,
+      "initial_user": 0
+    },
+    "train/test": {
+      "full_user": 0,
+      "state": 0,
+      "initial_user": 0
+    },
+    "validation/test": {
+      "full_user": 0,
+      "state": 0,
+      "initial_user": 0
+    }
+  }
+}

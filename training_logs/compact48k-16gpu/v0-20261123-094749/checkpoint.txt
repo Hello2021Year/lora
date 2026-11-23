@@ -1,0 +1,4 @@
+source_log=outputs/train-48k-x2-1-20261123-094408.log
+checkpoint=/mnt_upfs/spl/gitlab/lora/lora/outputs/compact48k-16gpu-train/v0-20261123-094749/checkpoint-82
+adapter_config.json 1205 bytes
+adapter_model.safetensors 233605480 bytes
