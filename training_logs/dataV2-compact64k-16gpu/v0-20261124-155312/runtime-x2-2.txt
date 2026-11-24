@@ -1,0 +1,12 @@
+source_log=outputs/dataV2-64k-train-offload-x2-2-20261124-155127.log
+checkpoint=/mnt_upfs/spl/gitlab/lora/lora/outputs/dataV2-compact64k-16gpu-train-offload/v0-20261124-155312/checkpoint-91
+/mnt_upfs/spl/gitlab/lora/lora/outputs/dataV2-compact64k-16gpu-train-offload/v0-20261124-155312/checkpoint-91/adapter_model.safetensors 34641304 bytes
+Verified 16 self_attn.o_proj + 48 linear_attn.out_proj + 64 mlp.down_proj; 17,301,504 trainable parameters at rank 8.
+rank=3 cuda=3 peak_allocated=69.08 GiB peak_reserved=72.00 GiB
+rank=6 cuda=6 peak_allocated=67.11 GiB peak_reserved=70.09 GiB
+rank=7 cuda=7 peak_allocated=67.16 GiB peak_reserved=69.85 GiB
+rank=1 cuda=1 peak_allocated=65.42 GiB peak_reserved=68.41 GiB
+rank=4 cuda=4 peak_allocated=66.66 GiB peak_reserved=69.77 GiB
+rank=2 cuda=2 peak_allocated=65.07 GiB peak_reserved=67.59 GiB
+rank=5 cuda=5 peak_allocated=66.31 GiB peak_reserved=69.13 GiB
+Train: 100%|██████████| 91/91 [3:56:53<00:00, 136.98s/it]Train: 100%|██████████| 91/91 [3:56:53<00:00, 136.98s/it]rank=0 cuda=0 peak_allocated=68.01 GiB peak_reserved=71.16 GiB
