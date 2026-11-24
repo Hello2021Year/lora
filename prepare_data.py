@@ -12,15 +12,16 @@ from collections import Counter
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-DATA_URL = (
-    "https://huggingface.co/datasets/sunpengliang/test/resolve/"
-    "219df35b1b72694c03556047b7337d6a1a0474e9/jev_datasets_v1.zip"
-)
-DATA_SHA256 = "f4d651c658f7b79f94e1ed603a07adf9c9ca50d33e670c849ef3236635612c16"
+VERSIONS = {
+    "v1": ("219df35b1b72694c03556047b7337d6a1a0474e9",
+           "f4d651c658f7b79f94e1ed603a07adf9c9ca50d33e670c849ef3236635612c16"),
+    "v2": ("38d3e26eb35c2dbd65618c547982abfb693f554b",
+           "9df7eab8c1188bf701859250c55ebb1826cdbd414771528025c75af69f3f964a"),
+}
+LABELS_BY_VERSION = {"v1": ("YES", "NO"), "v2": ("yes", "no")}
 MODEL_REVISION = "37561816e66b5b9153b1b64c10968c18c1e6f4a0"
 TOKENIZER_URL = f"https://huggingface.co/Qwen/Qwen3.8-27B/resolve/{MODEL_REVISION}/tokenizer.json"
 SPLITS = ("train", "validation", "test")
-LABELS = ("YES", "NO")
 LENGTH_MARGIN = 32
 
 
@@ -121,7 +122,7 @@ def prepare_split(archive, split, stage, tokenizer, args):
                 if [item["role"] for item in messages] != ["system", "user", "assistant"]:
                     raise ValueError(f"{split}: unexpected outer message roles")
                 label = messages[-1]["content"]
-                if label not in LABELS:
+                if label not in LABELS_BY_VERSION[args.data_version]:
                     raise ValueError(f"{split}: unexpected assistant label {label!r}")
                 payload = json.loads(messages[1]["content"])
                 history = payload["state_messages"]
@@ -140,7 +141,7 @@ def prepare_split(archive, split, stage, tokenizer, args):
                 lengths.append(length)
                 if length + LENGTH_MARGIN > args.max_length:
                     continue
-                if split == "train":
+                if split == "train" or (args.data_version == "v2" and split == "validation"):
                     selected.append(length)
                 kept_labels[messages[-1]["content"]] += 1
                 output.write(dump({"messages": messages}) + "\n")
@@ -157,31 +158,38 @@ def prepare_split(archive, split, stage, tokenizer, args):
         "unique": {key: len(values) for key, values in groups.items()},
     }
     if selected:
-        write_smoke(stage, selected)
+        report["smoke_tokens"] = write_smoke(stage, selected, split, args.data_version)
     return report, groups
 
 
-def write_smoke(stage, selected):
+def write_smoke(stage, selected, split, version):
     longest = sorted(range(len(selected)), key=selected.__getitem__, reverse=True)
-    # Include up to eight longest eligible examples in three 8-GPU optimizer steps.
-    indices = set(longest[:8])
-    indices.update(random.Random(42).sample(longest[8:], min(16, len(longest[8:]))))
-    with (stage / "train.jsonl").open(encoding="utf-8") as source, (stage / "smoke.jsonl").open(
+    if version == "v2":
+        indices = set(longest[:16])
+    else:
+        indices = set(longest[:8])
+        indices.update(random.Random(42).sample(longest[8:], min(16, len(longest[8:]))))
+    filename = "smoke.jsonl" if split == "train" else "smoke_validation.jsonl"
+    with (stage / f"{split}.jsonl").open(encoding="utf-8") as source, (stage / filename).open(
         "w", encoding="utf-8"
     ) as output:
         for index, line in enumerate(source):
             if index in indices:
                 output.write(line)
+    return [selected[index] for index in sorted(indices)]
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--archive", type=Path, default=Path("inputs/jev_datasets_v1.zip"))
+    parser.add_argument("--data-version", choices=VERSIONS, default="v1")
+    parser.add_argument("--archive", type=Path)
     parser.add_argument("--tokenizer", type=Path, default=Path("inputs/tokenizer.json"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--representation", choices=("compact", "full"), default="compact")
-    parser.add_argument("--max-length", type=int, default=49152)
+    parser.add_argument("--max-length", type=int)
     args = parser.parse_args()
+    if args.max_length is None:
+        args.max_length = 65536 if args.data_version == "v2" else 49152
     if args.output.exists():
         parser.error(f"choose a new --output directory: {args.output}")
     if args.max_length <= LENGTH_MARGIN:
@@ -189,7 +197,12 @@ def main():
 
     from tokenizers import Tokenizer
 
-    download(DATA_URL, args.archive, DATA_SHA256)
+    revision, checksum = VERSIONS[args.data_version]
+    archive_name = f"jev_datasets_{args.data_version}.zip"
+    if args.archive is None:
+        args.archive = Path("dataV2" if args.data_version == "v2" else "inputs") / archive_name
+    download(f"https://huggingface.co/datasets/sunpengliang/test/resolve/{revision}/{archive_name}",
+             args.archive, checksum)
     download(TOKENIZER_URL, args.tokenizer)
     tokenizer = Tokenizer.from_file(str(args.tokenizer))
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -197,7 +210,9 @@ def main():
         stage = Path(temp_dir) / "prepared"
         stage.mkdir()
         report = {
-            "archive_sha256": DATA_SHA256,
+            "data_version": args.data_version,
+            "source_revision": revision,
+            "archive_sha256": checksum,
             "reference_model_revision": MODEL_REVISION,
             "tokenizer_sha256": file_sha256(args.tokenizer),
             "representation": args.representation,

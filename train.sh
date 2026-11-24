@@ -17,7 +17,15 @@ if (( NNODES > 1 )); then
     : "${NODE_RANK:?Set NODE_RANK to 0 on the first node and 1 on the second}"
 fi
 
-max_length=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["max_length"])' "$data_dir/audit.json")
+metadata=$(python3 -c 'import json,sys; a=json.load(open(sys.argv[1])); print(a.get("data_version","v1"), a["max_length"])' "$data_dir/audit.json")
+read -r data_version max_length <<< "$metadata"
+case "$data_version" in
+    v1) target_args=(--target_modules all-linear) ;;
+    v2) target_args=(--target_regex '^(.*\.)?language_model\.layers\.[0-9]+\.(self_attn\.o_proj|linear_attn\.out_proj|mlp\.down_proj)$'
+            --external_plugins "$PWD/verify_output_lora.py" --callbacks verify_output_lora
+            --lora_dropout 0.05) ;;
+    *) echo "Unknown prepared data version: $data_version" >&2; exit 2 ;;
+esac
 model=${MODEL:-Qwen/Qwen3.8-27B}
 attn_impl=${ATTN_IMPL:-flash_attention_2}
 model_source=(--use_hf true)
@@ -45,10 +53,15 @@ if [[ "$mode" == smoke ]]; then
     smoke_steps=${SMOKE_STEPS:-3}
     mode_args=(
         --dataset "$data_dir/smoke.jsonl" --max_steps "$smoke_steps"
-        --gradient_accumulation_steps 1 --eval_strategy no
+        --gradient_accumulation_steps 1
         --save_strategy steps --save_steps "$smoke_steps"
         --create_checkpoint_symlink false
     )
+    if [[ "$data_version" == v2 ]]; then
+        mode_args+=(--val_dataset "$data_dir/smoke_validation.jsonl" --eval_strategy steps --eval_steps "$smoke_steps")
+    else
+        mode_args+=(--eval_strategy no)
+    fi
 else
     world_size=$((NPROC_PER_NODE * NNODES))
     gradient_accumulation=$(((16 + world_size - 1) / world_size))
@@ -64,7 +77,7 @@ fi
 exec swift sft \
     --model "$model" "${model_source[@]}" --model_type qwen3_5 --template qwen3_8 \
     --tuner_type lora --torch_dtype bfloat16 --deepspeed zero3 \
-    --target_modules all-linear --freeze_vit true --freeze_aligner true \
+    "${target_args[@]}" --freeze_vit true --freeze_aligner true \
     --lora_rank "${LORA_RANK:-8}" --lora_alpha "${LORA_ALPHA:-16}" \
     --learning_rate "${LEARNING_RATE:-5e-5}" --warmup_ratio 0.05 \
     --loss_scale last_round+ignore_empty_think --use_logits_to_keep true \

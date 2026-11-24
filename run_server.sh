@@ -12,7 +12,7 @@ Usage:
   bash run_server.sh train
   bash run_server.sh eval {validation|test} RUN_NAME [CHECKPOINT]
 
-Environment overrides: MODEL, RAW_DATA_DIR, TRAIN_CONDA_PREFIX,
+Environment overrides: DATA_VERSION (v1 or v2), MODEL, RAW_DATA_DIR, TRAIN_CONDA_PREFIX,
 PREPARED_DATA_DIR, CONDA_EXE. Training and evaluation also accept the
 environment overrides documented in README.md.
 EOF
@@ -34,8 +34,14 @@ fi
 export MODEL=${MODEL:-/mnt_upfs/models/qwen3/Qwen3.8-27B}
 raw_data_dir=${RAW_DATA_DIR:-/mnt_upfs/models/qwen3/test}
 conda_prefix=${TRAIN_CONDA_PREFIX:-/mnt_upfs/conda/swift-qwen38}
-prepared_dir=${PREPARED_DATA_DIR:-prepared/compact48k}
-archive="$raw_data_dir/jev_datasets_v1.zip"
+version=${DATA_VERSION:-v1}
+case "$version" in
+    v1) default_prepared=prepared/compact48k ;;
+    v2) default_prepared=prepared/dataV2-compact64k ;;
+    *) echo "DATA_VERSION must be v1 or v2" >&2; exit 2 ;;
+esac
+prepared_dir=${PREPARED_DATA_DIR:-$default_prepared}
+archive="$raw_data_dir/jev_datasets_${version}.zip"
 
 require_file() {
     if [[ ! -f "$1" || ! -s "$1" || ! -r "$1" ]]; then
@@ -56,6 +62,22 @@ fi
 
 require_file "$MODEL/config.json"
 require_file "$MODEL/tokenizer.json"
+
+if [[ "$action" == train || "$action" == smoke || "$action" == eval ]]; then
+    require_file "$prepared_dir/audit.json"
+    "${runner[@]}" python3 - "$prepared_dir/audit.json" "$version" "${EXPECTED_MAX_LENGTH:-}" <<'PY'
+import json
+import sys
+
+path, version, length = sys.argv[1:]
+with open(path) as source:
+    audit = json.load(source)
+if audit.get("data_version", "v1") != version:
+    sys.exit(f"{path}: prepared dataset version differs from {version}")
+if length and audit["max_length"] != int(length):
+    sys.exit(f"{path}: expected max_length={length}, got {audit['max_length']}")
+PY
+fi
 
 case "$action" in
     check)
@@ -100,15 +122,13 @@ if gpu_count < int(sys.argv[2]) or not torch.cuda.is_bf16_supported():
         ;;
     prepare)
         require_file "$archive"
-        exec "${runner[@]}" python3 prepare_data.py --archive "$archive" \
+        exec "${runner[@]}" python3 prepare_data.py --data-version "$version" --archive "$archive" \
             --tokenizer "$MODEL/tokenizer.json" --output "$prepared_dir" "$@"
         ;;
     smoke|train)
-        require_file "$prepared_dir/audit.json"
         exec "${runner[@]}" bash train.sh "$action" "$prepared_dir"
         ;;
     eval)
-        require_file "$prepared_dir/audit.json"
         exec "${runner[@]}" bash evaluate.sh "$prepared_dir" "$@"
         ;;
 esac

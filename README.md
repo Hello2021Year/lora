@@ -1,5 +1,9 @@
 # Qwen3.8-27B 工具选择判定微调
 
+**dataV2 双机 64K** 使用两台各 8 张 A800 80G、严格小写 `yes/no` 和全 64 个语言 block 的 128 个输出投影。服务器从 `/mnt_upfs/models/qwen3/test/jev_datasets_v2.zip` 读取数据。准备、长样本压测、训练和验证命令见 [dataV2 运行说明](dataV2/README.md)。
+
+## V1 实验
+
 首轮用 **单机 8 × A800 80GB，BF16 LoRA SFT，MS-Swift 4.6.1**。输入是历史状态和一个候选工具，模型输出严格等于 `YES` 或 `NO`。另一台机器可以独立跑输入方案对照或部署离线推理。
 
 ## 服务器路径
