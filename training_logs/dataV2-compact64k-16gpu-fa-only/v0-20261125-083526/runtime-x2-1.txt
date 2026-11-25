@@ -1,0 +1,10 @@
+source_log=outputs/dataV2-64k-fa-only-train-x2-1-20261125-083320.log
+rank=8 cuda=0 peak_allocated=60.70 GiB peak_reserved=63.61 GiB
+[INFO:swift] End time of running main: 2026-11-25 12:12:39.497163
+rank=15 cuda=7 peak_allocated=63.68 GiB peak_reserved=66.97 GiB
+rank=10 cuda=2 peak_allocated=66.03 GiB peak_reserved=69.84 GiB
+rank=13 cuda=5 peak_allocated=65.50 GiB peak_reserved=69.10 GiB
+rank=9 cuda=1 peak_allocated=65.94 GiB peak_reserved=69.47 GiB
+rank=14 cuda=6 peak_allocated=65.03 GiB peak_reserved=68.40 GiB
+rank=11 cuda=3 peak_allocated=65.76 GiB peak_reserved=69.47 GiB
+rank=12 cuda=4 peak_allocated=61.27 GiB peak_reserved=64.69 GiB

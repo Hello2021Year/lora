@@ -1,0 +1,173 @@
+{
+  "data_version": "v2",
+  "source_revision": "38d3e26eb35c2dbd65618c547982abfb693f554b",
+  "archive_sha256": "9df7eab8c1188bf701859250c55ebb1826cdbd414771528025c75af69f3f964a",
+  "reference_model_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+  "tokenizer_sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+  "representation": "compact",
+  "max_length": 65536,
+  "length_margin": 32,
+  "splits": {
+    "train": {
+      "rows": 1544,
+      "labels": {
+        "yes": 896,
+        "no": 648
+      },
+      "kept_rows": 1459,
+      "kept_labels": {
+        "yes": 856,
+        "no": 603
+      },
+      "dropped_overlength": 85,
+      "tokens": {
+        "min": 2468,
+        "p50": 21437,
+        "p90": 57495,
+        "p95": 67207,
+        "p99": 86662,
+        "max": 104686,
+        "total": 39864126,
+        "counts_at_caps_with_margin": {
+          "8192": 387,
+          "16384": 687,
+          "24576": 872,
+          "32768": 1036,
+          "49152": 1321,
+          "65536": 1459,
+          "98304": 1540
+        }
+      },
+      "unique": {
+        "full_user": 1544,
+        "state": 839,
+        "initial_user": 125
+      },
+      "smoke_tokens": [
+        65224,
+        64486,
+        64965,
+        63042,
+        65406,
+        64440,
+        65408,
+        63661,
+        63849,
+        63671,
+        63536,
+        63114,
+        65501,
+        63768,
+        63488,
+        64366
+      ]
+    },
+    "validation": {
+      "rows": 193,
+      "labels": {
+        "yes": 112,
+        "no": 81
+      },
+      "kept_rows": 187,
+      "kept_labels": {
+        "yes": 107,
+        "no": 80
+      },
+      "dropped_overlength": 6,
+      "tokens": {
+        "min": 2490,
+        "p50": 24799,
+        "p90": 52090,
+        "p95": 59076,
+        "p99": 86739,
+        "max": 89386,
+        "total": 4929623,
+        "counts_at_caps_with_margin": {
+          "8192": 46,
+          "16384": 68,
+          "24576": 94,
+          "32768": 140,
+          "49152": 172,
+          "65536": 187,
+          "98304": 193
+        }
+      },
+      "unique": {
+        "full_user": 193,
+        "state": 104,
+        "initial_user": 13
+      },
+      "smoke_tokens": [
+        54480,
+        54458,
+        54744,
+        54530,
+        54902,
+        58061,
+        58896,
+        59155,
+        48811,
+        58858,
+        59076,
+        52090,
+        59007,
+        59127,
+        51401,
+        63799
+      ]
+    },
+    "test": {
+      "rows": 193,
+      "labels": {
+        "yes": 112,
+        "no": 81
+      },
+      "kept_rows": 149,
+      "kept_labels": {
+        "yes": 84,
+        "no": 65
+      },
+      "dropped_overlength": 44,
+      "tokens": {
+        "min": 2597,
+        "p50": 27093,
+        "p90": 86456,
+        "p95": 93025,
+        "p99": 103123,
+        "max": 105933,
+        "total": 7060245,
+        "counts_at_caps_with_margin": {
+          "8192": 31,
+          "16384": 64,
+          "24576": 80,
+          "32768": 118,
+          "49152": 138,
+          "65536": 149,
+          "98304": 191
+        }
+      },
+      "unique": {
+        "full_user": 193,
+        "state": 108,
+        "initial_user": 12
+      }
+    }
+  },
+  "split_overlap": {
+    "train/validation": {
+      "full_user": 0,
+      "state": 0,
+      "initial_user": 0
+    },
+    "train/test": {
+      "full_user": 0,
+      "state": 0,
+      "initial_user": 0
+    },
+    "validation/test": {
+      "full_user": 0,
+      "state": 0,
+      "initial_user": 0
+    }
+  }
+}

@@ -1,0 +1,9 @@
+Verified 16 self_attn.o_proj; 1,441,792 trainable parameters at rank 8.
+rank=4 cuda=4 peak_allocated=63.60 GiB peak_reserved=66.89 GiB
+rank=6 cuda=6 peak_allocated=64.04 GiB peak_reserved=67.09 GiBrank=7 cuda=7 peak_allocated=64.09 GiB peak_reserved=67.75 GiB
+rank=3 cuda=3 peak_allocated=65.94 GiB peak_reserved=69.28 GiB
+rank=2 cuda=2 peak_allocated=62.08 GiB peak_reserved=65.41 GiB
+rank=5 cuda=5 peak_allocated=63.27 GiB peak_reserved=66.68 GiB
+rank=1 cuda=1 peak_allocated=62.41 GiB peak_reserved=65.84 GiB
+Train: 100%|██████████| 91/91 [3:33:48<00:00, 125.66s/it]Train: 100%|██████████| 91/91 [3:33:48<00:00, 125.66s/it]rank=0 cuda=0 peak_allocated=64.91 GiB peak_reserved=68.22 GiB
+[INFO:swift] End time of running main: 2026-11-25 12:12:39.506827
